@@ -13,6 +13,27 @@ const createLinkSchema = z.object({
     .optional(),
 });
 
+const updateLinkSchema = z
+  .object({
+    originalUrl: z.string().url().optional(),
+
+    alias: z
+      .string()
+      .min(3)
+      .max(30)
+      .regex(
+        /^[a-zA-Z0-9-]+$/,
+        "Alias can contain only letters, numbers and hyphens"
+      )
+      .optional(),
+  })
+  .refine(
+    (data) => data.originalUrl || data.alias,
+    {
+      message: "At least one field is required",
+    }
+  );
+
 module.exports = {
-  createLinkSchema,
+  createLinkSchema,updateLinkSchema
 };

@@ -1,9 +1,20 @@
 const express = require("express");
 
-const { create } = require("../controllers/link.controller");
+const {
+  create,
+  getLinks,
+  getLink,
+  update,
+  remove
+} = require("../controllers/link.controller");
+
+const authMiddleware = require("../middleware/auth.middleware");
 const optionalAuth = require("../middleware/optionalAuth.middleware");
 const validate = require("../middleware/validate.middleware");
-const { createLinkSchema } = require("../validators/link.validator");
+const {
+  createLinkSchema,
+  updateLinkSchema,
+} = require("../validators/link.validator");
 
 const router = express.Router();
 
@@ -12,6 +23,31 @@ router.post(
   optionalAuth,
   validate(createLinkSchema),
   create
+);
+
+router.get(
+  "/",
+  authMiddleware,
+  getLinks
+);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  getLink
+);
+
+router.patch(
+  "/:id",
+  authMiddleware,
+  validate(updateLinkSchema),
+  update
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  remove
 );
 
 module.exports = router;

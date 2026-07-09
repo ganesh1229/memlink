@@ -15,6 +15,107 @@ const createLink = async (originalUrl, customAlias, userId = null) => {
   return link;
 };
 
+const getUserLinks = async (userId) => {
+  return await prisma.link.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+const getLinkById = async (linkId, userId) => {
+  const link = await prisma.link.findFirst({
+    where: {
+      id: linkId,
+      userId,
+    },
+  });
+
+  if (!link) {
+    throw new Error("Link not found");
+  }
+
+  return link;
+};
+
+const updateLink = async (
+  linkId,
+  userId,
+  originalUrl,
+  alias
+) => {
+  const existingLink = await prisma.link.findFirst({
+    where: {
+      id: linkId,
+      userId,
+    },
+  });
+
+  if (!existingLink) {
+    throw new Error("Link not found");
+  }
+
+  if (alias && alias !== existingLink.alias) {
+    const aliasExists = await prisma.link.findUnique({
+      where: {
+        alias,
+      },
+    });
+
+    if (aliasExists) {
+      throw new Error("Alias already exists");
+    }
+  }
+
+  const updatedLink = await prisma.link.update({
+    where: {
+      id: linkId,
+    },
+    data: {
+      originalUrl: originalUrl ?? existingLink.originalUrl,
+      alias: alias ?? existingLink.alias,
+    },
+  });
+
+  return updatedLink;
+};
+
+const deleteLink = async (linkId, userId) => {
+  const link = await prisma.link.findFirst({
+    where: {
+      id: linkId,
+      userId,
+    },
+  });
+
+  if (!link) {
+    throw new Error("Link not found");
+  }
+
+  // const deleted = await prisma.clickEvent.deleteMany({
+  // where: {
+  //   linkId,
+  // },
+  // });
+
+  // console.log("Deleted ClickEvents:", deleted);
+
+  await prisma.clickEvent.deleteMany({
+    where: {
+      linkId,
+    },
+  });
+
+  await prisma.link.delete({
+    where: {
+      id: linkId,
+    },
+  });
+};
+
 module.exports = {
-  createLink,
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink
 };
