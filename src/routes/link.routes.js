@@ -5,7 +5,8 @@ const {
   getLinks,
   getLink,
   update,
-  remove
+  remove,
+  analytics
 } = require("../controllers/link.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -18,6 +19,8 @@ const {
 
 const router = express.Router();
 
+
+
 router.post(
   "/",
   optionalAuth,
@@ -29,6 +32,12 @@ router.get(
   "/",
   authMiddleware,
   getLinks
+);
+
+router.get(
+  "/:id/analytics",
+  authMiddleware,
+  analytics
 );
 
 router.get(

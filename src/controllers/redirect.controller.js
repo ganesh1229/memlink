@@ -10,9 +10,10 @@ const redirect = async (req, res) => {
     const link = await getLinkByAlias(alias);
 
     await recordClick(
-      link.id,
-      req.get("User-Agent"),
-      req.get("Referer") || null
+    link.id,
+    req.get("User-Agent"),
+    req.get("Referer") || null,
+    req.ip
     );
 
     return res.redirect(link.originalUrl);

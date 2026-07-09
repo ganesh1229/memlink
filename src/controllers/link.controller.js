@@ -3,8 +3,11 @@ const {
   getUserLinks,
   getLinkById,
   updateLink,
-  deleteLink
+  deleteLink,
+  getLinkAnalytics
 } = require("../services/link.service");
+
+const { groupBy } = require("../utils/analytics");
 
 const create = async (req, res) => {
   try {
@@ -133,6 +136,68 @@ const remove = async (req, res) => {
   }
 };
 
+const analytics = async (req, res) => {
+  try {
+    const link = await getLinkAnalytics(
+      req.params.id,
+      req.user.userId
+    );
+
+    const browserStats = groupBy(
+    link.clickEvents,
+    "browser"
+    );
+
+    const osStats = groupBy(
+    link.clickEvents,
+    "os"
+    );
+
+    const deviceStats = groupBy(
+      link.clickEvents,
+      "device"
+    );
+
+    link.clickEvents.forEach((click) => {
+      browserStats[click.browser] =
+        (browserStats[click.browser] || 0) + 1;
+
+      osStats[click.os] =
+        (osStats[click.os] || 0) + 1;
+
+      deviceStats[click.device] =
+        (deviceStats[click.device] || 0) + 1;
+    });
+
+    res.json({
+      success: true,
+      data: {
+        link: {
+          id: link.id,
+          alias: link.alias,
+          originalUrl: link.originalUrl,
+          shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+        },
+
+        totalClicks: link.clicks,
+
+        browserStats,
+
+        osStats,
+
+        deviceStats,
+
+        recentClicks: link.clickEvents.slice(0, 10),
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
-  create,getLinks,getLink,update,remove
+  create,getLinks,getLink,update,remove,analytics
 };

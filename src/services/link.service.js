@@ -116,6 +116,28 @@ const deleteLink = async (linkId, userId) => {
   });
 };
 
+const getLinkAnalytics = async (linkId, userId) => {
+  const link = await prisma.link.findFirst({
+    where: {
+      id: linkId,
+      userId,
+    },
+    include: {
+      clickEvents: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
+  if (!link) {
+    throw new Error("Link not found");
+  }
+
+  return link;
+};
+
 module.exports = {
-  createLink,getUserLinks,getLinkById,updateLink,deleteLink
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics
 };

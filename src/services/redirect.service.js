@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const UAParser = require("ua-parser-js");
 
 const getLinkByAlias = async (alias) => {
   const link = await prisma.link.findUnique({
@@ -14,25 +15,47 @@ const getLinkByAlias = async (alias) => {
   return link;
 };
 
-const recordClick = async (linkId, userAgent, referrer) => {
-  await prisma.link.update({
-    where: {
-      id: linkId,
-    },
-    data: {
-      clicks: {
-        increment: 1,
-      },
-    },
-  });
+const recordClick = async (
+  linkId,
+  userAgent,
+  referrer,
+  ipAddress
+) => {
+  const parser = new UAParser(userAgent);
 
-  await prisma.clickEvent.create({
-    data: {
-      linkId,
-      userAgent,
-      referrer,
-    },
-  });
+  const browser =
+    parser.getBrowser().name || "Unknown";
+
+  const os =
+    parser.getOS().name || "Unknown";
+
+  const device =
+    parser.getDevice().type || "Desktop";
+
+  await prisma.$transaction([
+    prisma.link.update({
+      where: {
+        id: linkId,
+      },
+      data: {
+        clicks: {
+          increment: 1,
+        },
+      },
+    }),
+
+    prisma.clickEvent.create({
+      data: {
+        linkId,
+        ipAddress,
+        userAgent,
+        browser,
+        os,
+        device,
+        referrer,
+      },
+    }),
+  ]);
 };
 
 module.exports = {
