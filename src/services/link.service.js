@@ -15,15 +15,66 @@ const createLink = async (originalUrl, customAlias, userId = null) => {
   return link;
 };
 
-const getUserLinks = async (userId) => {
-  return await prisma.link.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+const getUserLinks = async (
+  userId,
+  page = 1,
+  limit = 10,
+  search = "",
+  sort = "newest"
+) => {
+  const skip = (page - 1) * limit;
+
+  let orderBy = {
+    createdAt: "desc",
+  };
+
+  if (sort === "oldest") {
+    orderBy = {
+      createdAt: "asc",
+    };
+  }
+
+  if (sort === "clicks") {
+    orderBy = {
+      clicks: "desc",
+    };
+  }
+
+  const where = {
+    userId,
+    OR: [
+      {
+        alias: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+      {
+        originalUrl: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    ],
+  };
+
+  const [links, total] = await prisma.$transaction([
+    prisma.link.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy,
+    }),
+
+    prisma.link.count({
+      where,
+    }),
+  ]);
+
+  return {
+    links,
+    total,
+  };
 };
 
 const getLinkById = async (linkId, userId) => {

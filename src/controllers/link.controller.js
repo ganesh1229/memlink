@@ -39,7 +39,18 @@ const create = async (req, res) => {
 
 const getLinks = async (req, res) => {
   try {
-    const links = await getUserLinks(req.user.userId);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const sort = req.query.sort || "newest";
+
+    const { links, total } = await getUserLinks(
+      req.user.userId,
+      page,
+      limit,
+      search,
+      sort
+    );
 
     const data = links.map((link) => ({
       id: link.id,
@@ -51,9 +62,15 @@ const getLinks = async (req, res) => {
     }));
 
     res.status(200).json({
-      success: true,
-      data,
-    });
+  success: true,
+  pagination: {
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  },
+  data,
+});
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -157,17 +174,6 @@ const analytics = async (req, res) => {
       link.clickEvents,
       "device"
     );
-
-    link.clickEvents.forEach((click) => {
-      browserStats[click.browser] =
-        (browserStats[click.browser] || 0) + 1;
-
-      osStats[click.os] =
-        (osStats[click.os] || 0) + 1;
-
-      deviceStats[click.device] =
-        (deviceStats[click.device] || 0) + 1;
-    });
 
     res.json({
       success: true,
