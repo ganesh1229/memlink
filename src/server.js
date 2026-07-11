@@ -1,9 +1,20 @@
 require("dotenv").config();
+const { connectRedis } = require("./config/redis");
 
 const app = require("./app");
 
 const PORT = process.env.PORT || 5000;
-console.log("BASE_URL:", process.env.BASE_URL);
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await connectRedis();
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+startServer();

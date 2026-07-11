@@ -1,6 +1,9 @@
 const prisma = require("../config/prisma");
 const { generateUniqueAlias } = require("./alias.service");
 const ApiError=require("../utils/ApiError");
+const {
+  deleteCachedLink,
+} = require("./cache.service");
 
 const createLink = async (originalUrl, customAlias, userId = null) => {
   const alias = await generateUniqueAlias(customAlias);
@@ -107,19 +110,13 @@ const updateLink = async (
   });
 
   if (!existingLink) {
-    throw new ApiError(404,"Link not found");
+    throw new ApiError(404, "Link not found");
   }
 
-  if (alias && alias !== existingLink.alias) {
-    const aliasExists = await prisma.link.findUnique({
-      where: {
-        alias,
-      },
-    });
+  let updatedAlias = existingLink.alias;
 
-    if (aliasExists) {
-      throw new ApiError(409,"Alias already exists");
-    }
+  if (alias && alias !== existingLink.alias) {
+    updatedAlias = await generateUniqueAlias(alias);
   }
 
   const updatedLink = await prisma.link.update({
@@ -127,13 +124,23 @@ const updateLink = async (
       id: linkId,
     },
     data: {
-      originalUrl: originalUrl ?? existingLink.originalUrl,
-      alias: alias ?? existingLink.alias,
+      originalUrl:
+        originalUrl ?? existingLink.originalUrl,
+      alias: updatedAlias,
     },
   });
 
+  // Invalidate Redis cache
+  await deleteCachedLink(existingLink.alias);
+
+  // If alias changed, remove any stale cache under the new alias as well
+  if (updatedAlias !== existingLink.alias) {
+    await deleteCachedLink(updatedAlias);
+  }
+
   return updatedLink;
 };
+
 
 const deleteLink = async (linkId, userId) => {
   const link = await prisma.link.findFirst({
@@ -154,6 +161,7 @@ const deleteLink = async (linkId, userId) => {
   // });
 
   // console.log("Deleted ClickEvents:", deleted);
+  await deleteCachedLink(link.alias);
 
   await prisma.clickEvent.deleteMany({
     where: {

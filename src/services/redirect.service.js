@@ -2,16 +2,32 @@ const prisma = require("../config/prisma");
 const UAParser = require("ua-parser-js");
 const ApiError=require("../utils/ApiError");
 
+const {
+  getCachedLink,
+  cacheLink,
+} = require("./cache.service");
+
 const getLinkByAlias = async (alias) => {
-  const link = await prisma.link.findUnique({
+  let link = await getCachedLink(alias);
+
+  if (link) {
+    console.log("✅ Cache HIT");
+    return link;
+  }
+
+  console.log("❌ Cache MISS");
+
+  link = await prisma.link.findUnique({
     where: {
       alias,
     },
   });
 
   if (!link) {
-    throw new ApiError(404,"Link not found");
+    throw new ApiError(404, "Link not found");
   }
+
+  await cacheLink(alias, link);
 
   return link;
 };
