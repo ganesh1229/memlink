@@ -1,6 +1,7 @@
 const prisma = require("../config/prisma");
 const { hashPassword, comparePassword } = require("../utils/hash");
 const { generateToken } = require("../utils/jwt");
+const ApiError=require("../utils/ApiError");
 
 const registerUser = async (email, password) => {
   const existingUser = await prisma.user.findUnique({
@@ -10,7 +11,7 @@ const registerUser = async (email, password) => {
   });
 
   if (existingUser) {
-    throw new Error("User already exists");
+    throw new ApiError(401,"User already exists");
   }
 
   const hashedPassword = await hashPassword(password);
@@ -42,7 +43,7 @@ const loginUser = async (email, password) => {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new ApiError(404,"Invalid credentials");
   }
 
   const isMatch = await comparePassword(
@@ -51,7 +52,7 @@ const loginUser = async (email, password) => {
   );
 
   if (!isMatch) {
-    throw new Error("Invalid credentials");
+    throw new ApiError(404,"Invalid credentials");
   }
 
   const token = generateToken({

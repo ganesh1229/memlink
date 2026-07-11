@@ -1,10 +1,11 @@
+const asyncHandler = require("../utils/asyncHandler");
+
 const {
-  registerUser,
-  loginUser,
+  registerUser,loginUser,
 } = require("../services/auth.service");
 
-const register = async (req, res) => {
-  try {
+
+const register = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
     const result = await registerUser(
@@ -16,16 +17,10 @@ const register = async (req, res) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
-const login = async (req, res) => {
-  try {
+const login = asyncHandler(async (req, res) => {
+
     const { email, password } = req.body;
 
     const result = await loginUser(
@@ -37,13 +32,7 @@ const login = async (req, res) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
 module.exports = {
   register,

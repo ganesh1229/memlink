@@ -1,10 +1,10 @@
+const asyncHandler = require("../utils/asyncHandler");
+
 const {
-  getLinkByAlias,
-  recordClick,
+  getLinkByAlias,recordClick,
 } = require("../services/redirect.service");
 
-const redirect = async (req, res) => {
-  try {
+const redirect = asyncHandler(async (req, res) => {
     const alias = req.params.alias;
 
     const link = await getLinkByAlias(alias);
@@ -17,13 +17,7 @@ const redirect = async (req, res) => {
     );
 
     return res.redirect(link.originalUrl);
-  } catch (error) {
-    return res.status(404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
 module.exports = {
   redirect,

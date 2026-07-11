@@ -1,13 +1,14 @@
 const prisma = require("../config/prisma");
 const { generateShortCode } = require("../utils/shortCodeGenerator");
 const RESERVED_ALIASES = require("../constants/reservedAliases");
+const ApiError=require("../utils/ApiError");
 
 const generateUniqueAlias = async (customAlias = null) => {
   if (customAlias) {
     customAlias = customAlias.trim().toLowerCase();
 
     if (RESERVED_ALIASES.includes(customAlias)) {
-      throw new Error("This alias is reserved.");
+      throw new ApiError(409,"This alias is reserved.");
     }
 
     const existing = await prisma.link.findUnique({
@@ -17,7 +18,7 @@ const generateUniqueAlias = async (customAlias = null) => {
     });
 
     if (existing) {
-      throw new Error("Alias already exists.");
+      throw new ApiError(409,"Alias already exists.");
     }
 
     return customAlias;

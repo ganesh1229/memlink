@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const UAParser = require("ua-parser-js");
+const ApiError=require("../utils/ApiError");
 
 const getLinkByAlias = async (alias) => {
   const link = await prisma.link.findUnique({
@@ -9,7 +10,7 @@ const getLinkByAlias = async (alias) => {
   });
 
   if (!link) {
-    throw new Error("Link not found");
+    throw new ApiError(404,"Link not found");
   }
 
   return link;

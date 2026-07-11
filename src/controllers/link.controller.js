@@ -1,44 +1,35 @@
+const asyncHandler = require("../utils/asyncHandler");
+
 const {
-  createLink,
-  getUserLinks,
-  getLinkById,
-  updateLink,
-  deleteLink,
-  getLinkAnalytics
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics
 } = require("../services/link.service");
+
+
 
 const { groupBy } = require("../utils/analytics");
 
-const create = async (req, res) => {
-  try {
-    const { originalUrl, alias } = req.body;
+const create = asyncHandler(async (req, res) => {
+  const { originalUrl, alias } = req.body;
 
-    const userId = req.user?.userId || null;
+  const userId = req.user?.userId || null;
 
-    const link = await createLink(
-      originalUrl,
-      alias,
-      userId
-    );
+  const link = await createLink(
+    originalUrl,
+    alias,
+    userId
+  );
 
-    res.status(201).json({
-      success: true,
-      data: {
-        alias: link.alias,
-        originalUrl: link.originalUrl,
-        shortUrl: `${process.env.BASE_URL}/${link.alias}`,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(201).json({
+    success: true,
+    data: {
+      alias: link.alias,
+      originalUrl: link.originalUrl,
+      shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+    },
+  });
+});
 
-const getLinks = async (req, res) => {
-  try {
+const getLinks = asyncHandler(async (req, res) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const search = req.query.search || "";
@@ -71,16 +62,10 @@ const getLinks = async (req, res) => {
   },
   data,
 });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  });
 
-const getLink = async (req, res) => {
-  try {
+const getLink = asyncHandler(async (req, res) => {
+
     const link = await getLinkById(
       req.params.id,
       req.user.userId
@@ -97,16 +82,10 @@ const getLink = async (req, res) => {
         createdAt: link.createdAt,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
-const update = async (req, res) => {
-  try {
+const update = asyncHandler(async (req, res) => {
+
     const { originalUrl, alias } = req.body;
 
     const link = await updateLink(
@@ -126,16 +105,9 @@ const update = async (req, res) => {
         shortUrl: `${process.env.BASE_URL}/${link.alias}`,
       },
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
-const remove = async (req, res) => {
-  try {
+const remove = asyncHandler(async (req, res) => {
     await deleteLink(
       req.params.id,
       req.user.userId
@@ -145,16 +117,9 @@ const remove = async (req, res) => {
       success: true,
       message: "Link deleted successfully",
     });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
-const analytics = async (req, res) => {
-  try {
+const analytics = asyncHandler(async (req, res) => {
     const link = await getLinkAnalytics(
       req.params.id,
       req.user.userId
@@ -196,13 +161,7 @@ const analytics = async (req, res) => {
         recentClicks: link.clickEvents.slice(0, 10),
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+});
 
 module.exports = {
   create,getLinks,getLink,update,remove,analytics

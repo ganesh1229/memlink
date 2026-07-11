@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const { generateUniqueAlias } = require("./alias.service");
+const ApiError=require("../utils/ApiError");
 
 const createLink = async (originalUrl, customAlias, userId = null) => {
   const alias = await generateUniqueAlias(customAlias);
@@ -86,7 +87,7 @@ const getLinkById = async (linkId, userId) => {
   });
 
   if (!link) {
-    throw new Error("Link not found");
+    throw new ApiError(404,"Link not found");
   }
 
   return link;
@@ -106,7 +107,7 @@ const updateLink = async (
   });
 
   if (!existingLink) {
-    throw new Error("Link not found");
+    throw new ApiError(404,"Link not found");
   }
 
   if (alias && alias !== existingLink.alias) {
@@ -117,7 +118,7 @@ const updateLink = async (
     });
 
     if (aliasExists) {
-      throw new Error("Alias already exists");
+      throw new ApiError(409,"Alias already exists");
     }
   }
 
@@ -143,7 +144,7 @@ const deleteLink = async (linkId, userId) => {
   });
 
   if (!link) {
-    throw new Error("Link not found");
+    throw new ApiError(404,"Link not found");
   }
 
   // const deleted = await prisma.clickEvent.deleteMany({
@@ -183,7 +184,7 @@ const getLinkAnalytics = async (linkId, userId) => {
   });
 
   if (!link) {
-    throw new Error("Link not found");
+    throw new ApiError(404,"Link not found");
   }
 
   return link;
