@@ -1,22 +1,20 @@
 const asyncHandler = require("../utils/asyncHandler");
 
 const {
-  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics,unlockLink,getLinkQRCode,
 } = require("../services/link.service");
 
-
+const { generateQRCode } = require("../services/qrcode.service");
 
 const { groupBy } = require("../utils/analytics");
 
 const create = asyncHandler(async (req, res) => {
-  const { originalUrl, alias } = req.body;
-
+  const {
+  originalUrl,alias,expiresAt,password,
+  } = req.body;
   const userId = req.user?.userId || null;
-
   const link = await createLink(
-    originalUrl,
-    alias,
-    userId
+  originalUrl,alias,userId,expiresAt,password
   );
 
   res.status(201).json({
@@ -163,6 +161,45 @@ const analytics = asyncHandler(async (req, res) => {
     });
 });
 
+const unlock = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+
+  const unlockToken = await unlockLink(
+    req.params.alias,
+    password
+  );
+
+  res.cookie("unlockToken", unlockToken, {
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 5 * 60 * 1000,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Link unlocked successfully",
+  });
+});
+
+const qrCode = asyncHandler(async (req, res) => {
+  const link = await getLinkQRCode(
+    req.params.id,
+    req.user.userId
+  );
+
+  const qr = await generateQRCode(
+    `${process.env.BASE_URL}/${link.alias}`
+  );
+
+  res.status(200).json({
+    success: true,
+    data: {
+      shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+      qrCode: qr,
+    },
+  });
+});
+
 module.exports = {
-  create,getLinks,getLink,update,remove,analytics
+  create,getLinks,getLink,update,remove,analytics,unlock,qrCode
 };

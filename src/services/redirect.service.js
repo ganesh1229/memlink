@@ -5,29 +5,54 @@ const ApiError=require("../utils/ApiError");
 const {
   getCachedLink,
   cacheLink,
+  isUnlocked,
 } = require("./cache.service");
 
-const getLinkByAlias = async (alias) => {
+const getLinkByAlias = async (alias,unlockToken) => {
   let link = await getCachedLink(alias);
+
 
   if (link) {
     console.log("✅ Cache HIT");
-    return link;
+  } else {
+    console.log("❌ Cache MISS");
+
+    link = await prisma.link.findUnique({
+      where: {
+        alias,
+      },
+    });
+
+    if (!link) {
+      throw new ApiError(404, "Link not found");
+    }
+
+    await cacheLink(alias, link);
   }
 
-  console.log("❌ Cache MISS");
-
-  link = await prisma.link.findUnique({
-    where: {
-      alias,
-    },
-  });
-
-  if (!link) {
-    throw new ApiError(404, "Link not found");
+  if (
+    link.expiresAt &&
+    new Date() > new Date(link.expiresAt)
+  ) {
+    throw new ApiError(410, "This link has expired.");
   }
 
-  await cacheLink(alias, link);
+  const hasPassword =
+  link.hasPassword ?? !!link.password;
+
+if (hasPassword) {
+  const unlocked = await isUnlocked(
+    alias,
+    unlockToken
+  );
+
+  if (!unlocked) {
+    throw new ApiError(
+      401,
+      "Password required"
+    );
+  }
+}
 
   return link;
 };

@@ -1,7 +1,7 @@
 const asyncHandler = require("../utils/asyncHandler");
 
 const {
-  registerUser,loginUser,
+  registerUser,loginUser,refreshAccessToken,logoutUser
 } = require("../services/auth.service");
 
 
@@ -34,7 +34,48 @@ const login = asyncHandler(async (req, res) => {
     });
 });
 
+const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    const data = await logoutUser(
+      refreshToken,
+      req.user.userId
+    );
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    const data = await logoutUser(refreshToken);
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  refresh,
+  logout
 };

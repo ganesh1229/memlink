@@ -3,6 +3,8 @@ const express = require("express");
 const {
   register,
   login,
+  refresh,
+  logout
 } = require("../controllers/auth.controller");
 
 const validate = require("../middleware/validate.middleware");
@@ -13,10 +15,12 @@ const {
 const authLimiter = require(
   "../middleware/authRateLimit.middleware"
 );
+const authMiddleware = require("../middleware/auth.middleware");
 
 
 
 const router = express.Router();
+
 
 
 router.post(
@@ -31,6 +35,17 @@ router.post(
   authLimiter,
   validate(loginSchema),
   login
+);
+
+router.post(
+  "/refresh",
+  refresh
+);
+
+router.post(
+  "/logout",
+  authMiddleware,
+  logout
 );
 
 module.exports = router;

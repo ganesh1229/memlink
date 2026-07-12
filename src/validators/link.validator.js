@@ -10,7 +10,11 @@ const createLinkSchema = z.object({
       /^[a-zA-Z0-9-]+$/,
       "Alias can contain only letters, numbers and hyphens"
     )
+    
     .optional(),
+    expiresAt: z.string().datetime().optional(),
+
+    password: z.string().min(6).optional(),
 });
 
 const updateLinkSchema = z
