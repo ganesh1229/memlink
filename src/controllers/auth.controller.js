@@ -34,44 +34,30 @@ const login = asyncHandler(async (req, res) => {
     });
 });
 
-const refresh = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
+const refresh = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
 
-    const data = await logoutUser(
-      refreshToken,
-      req.user.userId
-    );
+  const data = await refreshAccessToken(refreshToken);
 
-    res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
 
-const logout = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
+const logout = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
 
-    const data = await logoutUser(refreshToken);
+  const data = await logoutUser(
+    refreshToken,
+    req.user.userId
+  );
 
-    res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
 
 module.exports = {
   register,

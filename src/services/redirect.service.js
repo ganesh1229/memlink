@@ -13,9 +13,9 @@ const getLinkByAlias = async (alias,unlockToken) => {
 
 
   if (link) {
-    console.log("✅ Cache HIT");
+    // console.log("✅ Cache HIT");
   } else {
-    console.log("❌ Cache MISS");
+    // console.log("❌ Cache MISS");
 
     link = await prisma.link.findUnique({
       where: {
