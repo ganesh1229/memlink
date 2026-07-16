@@ -23,3 +23,4 @@ export const generateQRCode = async (id) => {
 
   return response.data;
 };
+

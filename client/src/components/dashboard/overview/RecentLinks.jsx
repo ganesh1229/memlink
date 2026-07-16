@@ -1,38 +1,49 @@
-import { ExternalLink, Copy } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Copy, ExternalLink } from "lucide-react";
+
+import { getRecentLinks } from "../../../services/dashboard.service";
 
 function RecentLinks() {
-  const links = [
-    {
-      id: 1,
-      alias: "portfolio",
-      url: "https://portfolio.com",
-      clicks: 52,
-    },
-    {
-      id: 2,
-      alias: "resume",
-      url: "https://resume.com",
-      clicks: 18,
-    },
-    {
-      id: 3,
-      alias: "github",
-      url: "https://github.com",
-      clicks: 9,
-    },
-  ];
+  const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLinks();
+  }, []);
+
+  const fetchLinks = async () => {
+    try {
+      const response = await getRecentLinks();
+      setLinks(response.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = async (url) => {
+    await navigator.clipboard.writeText(url);
+    alert("Copied!");
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        Loading recent links...
+      </div>
+    );
+  }
 
   return (
-    <section className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">
+      <div className="mb-5 flex items-center justify-between">
+
+        <h2 className="text-xl font-semibold">
           Recent Links
         </h2>
 
-        <button className="text-blue-600 font-medium hover:underline">
-          View All
-        </button>
       </div>
 
       <div className="space-y-4">
@@ -40,38 +51,40 @@ function RecentLinks() {
         {links.map((link) => (
           <div
             key={link.id}
-            className="flex items-center justify-between rounded-2xl border border-slate-200 p-5 hover:bg-slate-50 transition"
+            className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
           >
 
             <div>
-              <h3 className="font-semibold text-lg">
+
+              <h3 className="font-semibold">
                 {link.alias}
               </h3>
 
-              <p className="text-slate-500 text-sm">
-                {link.url}
+              <p className="text-sm text-slate-500">
+                {link.shortUrl}
               </p>
+
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
 
-              <div className="text-center">
-                <p className="text-2xl font-bold">
-                  {link.clicks}
-                </p>
-
-                <p className="text-xs text-slate-500">
-                  Clicks
-                </p>
-              </div>
-
-              <button className="rounded-xl p-3 hover:bg-slate-100">
+              <button
+                onClick={() =>
+                  handleCopy(link.shortUrl)
+                }
+                className="rounded-lg p-2 hover:bg-slate-100"
+              >
                 <Copy size={18} />
               </button>
 
-              <button className="rounded-xl p-3 hover:bg-slate-100">
+              <a
+                href={link.shortUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg p-2 hover:bg-slate-100"
+              >
                 <ExternalLink size={18} />
-              </button>
+              </a>
 
             </div>
 
@@ -80,7 +93,7 @@ function RecentLinks() {
 
       </div>
 
-    </section>
+    </div>
   );
 }
 

@@ -1,52 +1,83 @@
+import { useEffect, useState } from "react";
+
+import {
+  Link2,
+  MousePointerClick,
+  Activity,
+  Trophy,
+} from "lucide-react";
+
 import StatsCard from "./StatsCard";
+import { getDashboardStats } from "../../../services/dashboard.service";
 
 function StatsSection() {
-  const stats = [
-    {
-      title: "Total Links",
-      value: "0",
-      subtitle: "Links created",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600",
-    },
-    {
-      title: "Total Clicks",
-      value: "0",
-      subtitle: "Across all links",
-      bgColor: "bg-green-50",
-      textColor: "text-green-600",
-    },
-    {
-      title: "QR Codes",
-      value: "0",
-      subtitle: "Generated",
-      bgColor: "bg-purple-50",
-      textColor: "text-purple-600",
-    },
-    {
-      title: "Active Links",
-      value: "0",
-      subtitle: "Currently active",
-      bgColor: "bg-orange-50",
-      textColor: "text-orange-600",
-    },
-  ];
+  const [stats, setStats] = useState({
+    totalLinks: 0,
+    totalClicks: 0,
+    todayClicks: 0,
+    topLink: null,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await getDashboardStats();
+      setStats(response.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="h-32 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-32 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-32 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-32 animate-pulse rounded-2xl bg-slate-200" />
+      </div>
+    );
+  }
 
   return (
-    <section>
-      <h2 className="mb-5 text-2xl font-bold">
-        Overview
-      </h2>
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <StatsCard
-            key={stat.title}
-            {...stat}
-          />
-        ))}
-      </div>
-    </section>
+      <StatsCard
+        title="Total Links"
+        value={stats.totalLinks}
+        icon={<Link2 size={22} />}
+      />
+
+      <StatsCard
+        title="Total Clicks"
+        value={stats.totalClicks}
+        icon={<MousePointerClick size={22} />}
+      />
+
+      <StatsCard
+        title="Today's Clicks"
+        value={stats.todayClicks}
+        icon={<Activity size={22} />}
+      />
+
+      <StatsCard
+        title="Top Link"
+        value={
+          stats.topLink
+            ? `${stats.topLink.alias} (${stats.topLink.clicks})`
+            : "-"
+        }
+        icon={<Trophy size={22} />}
+      />
+
+    </div>
   );
 }
 
