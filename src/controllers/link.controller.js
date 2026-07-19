@@ -194,8 +194,8 @@ const unlock = asyncHandler(async (req, res) => {
 
   res.cookie("unlockToken", unlockToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: "none",
+    secure: true,
     maxAge: 5 * 60 * 1000,
   });
 
