@@ -18,7 +18,7 @@ function PasswordProtected() {
 
 const handleUnlock = async (e) => {
   e.preventDefault();
-
+  alert("Unlock clicked");
   console.log("Button clicked");
 
   try {
