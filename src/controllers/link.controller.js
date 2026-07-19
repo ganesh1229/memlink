@@ -196,6 +196,7 @@ const unlock = asyncHandler(async (req, res) => {
     httpOnly: true,
     sameSite: "none",
     secure: true,
+    path:"/",
     maxAge: 5 * 60 * 1000,
   });
 
