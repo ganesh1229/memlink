@@ -9,6 +9,8 @@ const {
 } = require("./cache.service");
 
 const getLinkByAlias = async (alias,unlockToken) => {
+  
+
   let link = await getCachedLink(alias);
 
   
@@ -35,16 +37,14 @@ const getLinkByAlias = async (alias,unlockToken) => {
   ){
     throw new ApiError(410, "This link has expired.");
   }
-
-  const hasPassword =
-  link.hasPassword ?? !!link.password;
+  
+  const hasPassword = link.hasPassword ?? !!link.password;
 
   console.log("Alias:", alias);
   console.log("Cookie unlockToken:", unlockToken);
   console.log("Has Password:", hasPassword);
 
 if (hasPassword) {
-  
   const unlocked = await isUnlocked(
     alias,
     unlockToken
