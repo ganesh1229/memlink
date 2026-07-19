@@ -9,7 +9,7 @@ const redirect = asyncHandler(async (req, res) => {
 
   console.log("Cookies:", req.cookies);
   console.log("Unlock token:", req.cookies.unlockToken);
-  throw new Error("GETLINKBYALIAS CALLED");
+  
   const link = await getLinkByAlias(
     req.params.alias,
     req.cookies.unlockToken
