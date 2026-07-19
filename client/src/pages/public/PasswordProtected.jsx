@@ -18,22 +18,24 @@ function PasswordProtected() {
 
 const handleUnlock = async (e) => {
   e.preventDefault();
-  alert("Unlock clicked");
-  console.log("Button clicked");
+
+  setLoading(true);
+  setError("");
 
   try {
-    console.log("Before API");
+    await unlockLink(alias, password);
 
-    const res = await unlockLink(alias, password);
-
-    console.log("API Success", res);
-
-    window.location.href = `https://memlink-backend.onrender.com/${alias}`;
+    window.location.href =
+      `https://memlink-backend.onrender.com/${alias}`;
   } catch (err) {
-    console.log("API Error", err);
-    console.log(err.response);
-
     toast.error(err.response?.data?.message || "Something went wrong");
+
+    setError(
+      err.response?.data?.message ??
+      "Invalid password"
+    );
+  } finally {
+    setLoading(false);
   }
 };
 
