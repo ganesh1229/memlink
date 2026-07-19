@@ -23,10 +23,14 @@ const handleUnlock = async (e) => {
   setError("");
 
   try {
-    await unlockLink(alias, password);
+    const response = await unlockLink(alias, password);
 
-    window.location.href =
-      `https://memlink-backend.onrender.com/${alias}`;
+    console.log("Unlock response:", response.data);
+
+    // TEMPORARILY stop here
+    return;
+
+// window.location.href = `https://memlink-backend.onrender.com/${alias}`;
   } catch (err) {
     toast.error(err.response?.data?.message || "Something went wrong");
 
