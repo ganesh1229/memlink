@@ -6,6 +6,10 @@ const {
 } = require("../services/redirect.service");
 
 const redirect = asyncHandler(async (req, res) => {
+
+  console.log("Cookies:", req.cookies);
+  console.log("Unlock token:", req.cookies.unlockToken);
+  
   const link = await getLinkByAlias(
     req.params.alias,
     req.cookies.unlockToken
