@@ -173,13 +173,6 @@ const deleteLink = async (linkId, userId) => {
     throw new ApiError(404,"Link not found");
   }
 
-  // const deleted = await prisma.clickEvent.deleteMany({
-  // where: {
-  //   linkId,
-  // },
-  // });
-
-  // console.log("Deleted ClickEvents:", deleted);
   await deleteCachedLink(link.alias);
 
   await prisma.clickEvent.deleteMany({

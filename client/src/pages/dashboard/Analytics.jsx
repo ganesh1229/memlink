@@ -20,9 +20,12 @@ function Analytics() {
     try {
       const response = await getAnalytics();
       setAnalytics(response.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
+    }catch (err) {
+      toast.error(
+        err.response?.data?.message || "Something went wrong"
+      );
+    } 
+    finally {
       setLoading(false);
     }
   };

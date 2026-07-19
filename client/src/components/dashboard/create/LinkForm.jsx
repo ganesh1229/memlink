@@ -75,15 +75,7 @@ function LinkForm({
         expiresAt: "",
       });
     } catch (err) {
-      console.error(err);
-
-      console.error(
-        err.response?.data
-      );
-
-      toast(
-          "Failed to create link"
-      );
+       toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }

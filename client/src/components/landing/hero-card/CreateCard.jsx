@@ -25,11 +25,7 @@ function CreateCard() {
 
       setResult(response.data);
     } catch (err) {
-      console.error(err);
-
-      toast(
-          "Failed to create link"
-      );
+      toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }

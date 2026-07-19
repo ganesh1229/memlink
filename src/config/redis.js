@@ -10,7 +10,6 @@ redisClient.on("error", (err) => {
 
 const connectRedis = async () => {
   await redisClient.connect();
-  // console.log("✅ Redis Connected");
 };
 
 module.exports = {

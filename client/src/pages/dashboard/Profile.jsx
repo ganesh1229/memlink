@@ -17,8 +17,10 @@ function Profile() {
     try {
       const response = await getProfile();
       setProfile(response.data);
-    } catch (err) {
-      console.error(err);
+    }catch (err) {
+      toast.error(
+        err.response?.data?.message || "Something went wrong"
+      );
     }
   };
 

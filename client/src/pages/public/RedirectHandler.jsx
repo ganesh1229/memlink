@@ -27,7 +27,7 @@ function RedirectHandler() {
 
         window.location.href = `http://localhost:5000/${alias}`;
       } catch (err) {
-        console.error(err);
+        toast.error(err.response?.data?.message || "Something went wrong");
 
         navigate("/404");
       }

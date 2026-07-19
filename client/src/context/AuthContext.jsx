@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
           response.data.accessToken
         );
       } catch (err) {
-        console.log("No active session");
+        toast.error(err.response?.data?.message || "Something went wrong");
       } finally {
         setInitializing(false);
       }

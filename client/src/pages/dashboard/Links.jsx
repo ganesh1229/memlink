@@ -44,8 +44,11 @@ function Links() {
         response.pagination.totalPages
       );
     } catch (err) {
-      console.error(err);
-    } finally {
+      toast.error(
+        err.response?.data?.message || "Something went wrong"
+      );
+    }
+     finally {
       setLoading(false);
     }
   };
@@ -60,7 +63,9 @@ function Links() {
         qrCode: response.data.qrCode,
       });
     } catch (err) {
-      console.error(err);
+      toast.error(
+        err.response?.data?.message || "Something went wrong"
+      );
     }
   };
 

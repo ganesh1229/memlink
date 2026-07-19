@@ -11,7 +11,7 @@ function Navbar() {
       await logout();
       navigate("/");
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
 

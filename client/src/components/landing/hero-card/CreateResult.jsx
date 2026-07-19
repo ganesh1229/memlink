@@ -22,7 +22,7 @@ function CreateResult({ result, onReset }) {
         setCopied(false);
       }, 2000);
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || "Something went wrong");
     }
   };
 
