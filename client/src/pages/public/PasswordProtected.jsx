@@ -25,7 +25,7 @@ function PasswordProtected() {
     try {
 
       await unlockLink(alias, password);
-      console.log("Stored unlock token:", unlockToken);
+
 
       window.location.href =
         `https://memlink-backend.onrender.com/${alias}`;
