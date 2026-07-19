@@ -16,28 +16,26 @@ function PasswordProtected() {
   const [error, setError] =
     useState("");
 
-  const handleUnlock = async (e) => {
-    e.preventDefault();
+const handleUnlock = async (e) => {
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  console.log("Button clicked");
 
-    try {
-      await unlockLink(alias, password);
+  try {
+    console.log("Before API");
 
-      window.location.href =
-        `https://memlink-backend.onrender.com/${alias}`;
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong");
+    const res = await unlockLink(alias, password);
 
-      setError(
-        err.response?.data?.message ??
-          "Invalid password"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("API Success", res);
+
+    window.location.href = `https://memlink-backend.onrender.com/${alias}`;
+  } catch (err) {
+    console.log("API Error", err);
+    console.log(err.response);
+
+    toast.error(err.response?.data?.message || "Something went wrong");
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100">
