@@ -9,6 +9,8 @@ const testRoutes = require("./routes/test.routes");
 const linkRoutes = require("./routes/link.routes");
 const redirectRoutes = require("./routes/redirect.routes");
 const healthRoutes = require("./routes/health.routes");
+const userRoutes = require("./routes/user.routes");
+
 
 const apiLimiter = require("./middleware/rateLimit.middleware");
 const errorHandler = require("./middleware/error.middleware");
@@ -23,17 +25,15 @@ app.set("trust proxy", 1);
 /**
  * Core Middleware
  */
-app.use(express.json());
-app.use(cookieParser());
-
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL ||
-      "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
+
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(helmet());
 
@@ -58,6 +58,8 @@ app.get("/", (req, res) => {
 /**
  * API Routes
  */
+
+app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/test", testRoutes);
 app.use("/links", linkRoutes);

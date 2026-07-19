@@ -4,6 +4,8 @@ import {
   X,
 } from "lucide-react";
 
+import toast from "react-hot-toast";
+
 function QRModal({
   open,
   link,
@@ -16,7 +18,7 @@ function QRModal({
       link.shortUrl
     );
 
-    alert("Short URL copied!");
+    toast.success("Link copied!");
   };
 
   const handleDownload = () => {

@@ -2,7 +2,7 @@ const asyncHandler = require("../utils/asyncHandler");
 
 const {
   getLinkByAlias,
-  recordClick,
+  recordClick,resolveLink
 } = require("../services/redirect.service");
 
 const redirect = asyncHandler(async (req, res) => {
@@ -21,6 +21,17 @@ const redirect = asyncHandler(async (req, res) => {
   return res.redirect(link.originalUrl);
 });
 
+const resolve = asyncHandler(async (req, res) => {
+  const result = await resolveLink(
+    req.params.alias
+  );
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
 module.exports = {
-  redirect,
+  redirect,resolve
 };

@@ -8,7 +8,8 @@ const {
   remove,
   analytics,
   unlock,
-  qrCode
+  qrCode,
+  getStats,getAnalytics
 } = require("../controllers/link.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -34,6 +35,18 @@ router.get(
   "/",
   authMiddleware,
   getLinks
+);
+
+router.get(
+  "/analytics",
+  authMiddleware,
+  getAnalytics
+);
+
+router.get(
+  "/stats",
+  authMiddleware,
+  getStats
 );
 
 router.post(

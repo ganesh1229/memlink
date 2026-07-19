@@ -1,7 +1,8 @@
 const asyncHandler = require("../utils/asyncHandler");
 
 const {
-  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics,unlockLink,getLinkQRCode,
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics,
+  unlockLink,getLinkQRCode,getDashboardStats,getAnalyticsService
 } = require("../services/link.service");
 
 const { generateQRCode } = require("../services/qrcode.service");
@@ -9,20 +10,42 @@ const { generateQRCode } = require("../services/qrcode.service");
 const { groupBy } = require("../utils/analytics");
 
 const create = asyncHandler(async (req, res) => {
-  const {
-  originalUrl,alias,expiresAt,password,
+  let {
+    originalUrl,
+    alias,
+    expiresAt,
+    password,
   } = req.body;
+
   const userId = req.user?.userId || null;
+
+  // Guests can only create basic short links
+  if (!userId) {
+    alias = undefined;
+    password = undefined;
+    expiresAt = undefined;
+  }
+
   const link = await createLink(
-  originalUrl,alias,userId,expiresAt,password
+    originalUrl,
+    alias,
+    userId,
+    expiresAt,
+    password
   );
+
+  const shortUrl = `${process.env.CLIENT_URL}/${link.alias}`;
+
+  const qrCode = await generateQRCode(shortUrl);
 
   res.status(201).json({
     success: true,
     data: {
+      id: link.id,
       alias: link.alias,
       originalUrl: link.originalUrl,
-      shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+      shortUrl,
+      qrCode,
     },
   });
 });
@@ -46,7 +69,7 @@ const getLinks = asyncHandler(async (req, res) => {
       alias: link.alias,
       originalUrl: link.originalUrl,
       clicks: link.clicks,
-      shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+      shortUrl: `${process.env.CLIENT_URL}/${link.alias}`,
       createdAt: link.createdAt,
     }));
 
@@ -76,7 +99,7 @@ const getLink = asyncHandler(async (req, res) => {
         alias: link.alias,
         originalUrl: link.originalUrl,
         clicks: link.clicks,
-        shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+        shortUrl: `${process.env.CLIENT_URL}/${link.alias}`,
         createdAt: link.createdAt,
       },
     });
@@ -100,7 +123,7 @@ const update = asyncHandler(async (req, res) => {
         alias: link.alias,
         originalUrl: link.originalUrl,
         clicks: link.clicks,
-        shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+        shortUrl: `${process.env.CLIENT_URL}/${link.alias}`,
       },
     });
 });
@@ -145,7 +168,7 @@ const analytics = asyncHandler(async (req, res) => {
           id: link.id,
           alias: link.alias,
           originalUrl: link.originalUrl,
-          shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+          shortUrl: `${process.env.CLIENT_URL}/${link.alias}`,
         },
 
         totalClicks: link.clicks,
@@ -171,7 +194,8 @@ const unlock = asyncHandler(async (req, res) => {
 
   res.cookie("unlockToken", unlockToken, {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
+    secure: false,
     maxAge: 5 * 60 * 1000,
   });
 
@@ -188,18 +212,40 @@ const qrCode = asyncHandler(async (req, res) => {
   );
 
   const qr = await generateQRCode(
-    `${process.env.BASE_URL}/${link.alias}`
+    `${process.env.CLIENT_URL}/${link.alias}`
   );
 
   res.status(200).json({
     success: true,
     data: {
-      shortUrl: `${process.env.BASE_URL}/${link.alias}`,
+      shortUrl: `${process.env.CLIENT_URL}/${link.alias}`,
       qrCode: qr,
     },
   });
 });
 
+const getStats = asyncHandler(async (req, res) => {
+  const stats = await getDashboardStats(
+    req.user.userId
+  );
+
+  res.status(200).json({
+    success: true,
+    data: stats,
+  });
+});
+
+const getAnalytics = asyncHandler(async (req, res) => {
+  const analytics = await getAnalyticsService(
+    req.user.userId
+  );
+
+  res.status(200).json({
+    success: true,
+    data: analytics,
+  });
+});
+
 module.exports = {
-  create,getLinks,getLink,update,remove,analytics,unlock,qrCode
+  create,getLinks,getLink,update,remove,analytics,unlock,qrCode,getStats,getAnalytics
 };

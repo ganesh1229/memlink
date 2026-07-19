@@ -1,119 +1,54 @@
 import { useState } from "react";
-import {
-  Link2,
-  Globe,
-  Lock,
-  Calendar,
-} from "lucide-react";
+import { Globe } from "lucide-react";
 
 function CreateForm({
   activeTab,
   loading,
   onSubmit,
 }) {
-  const [formData, setFormData] = useState({
-    originalUrl: "",
-    alias: "",
-    password: "",
-    expiresAt: "",
-  });
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const [originalUrl, setOriginalUrl] =
+    useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    onSubmit(formData);
+    onSubmit({
+      originalUrl,
+    });
+
+    setOriginalUrl("");
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5"
+      className="space-y-6"
     >
-      {/* Original URL */}
-
       <div>
         <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
           <Globe size={16} />
+
           Original URL
         </label>
 
         <input
           type="url"
-          name="originalUrl"
-          value={formData.originalUrl}
-          onChange={handleChange}
-          placeholder="https://example.com"
           required
-          className="h-14 w-full rounded-2xl border border-slate-300 px-4 outline-none transition-all focus:border-blue-500"
+          value={originalUrl}
+          onChange={(e) =>
+            setOriginalUrl(
+              e.target.value
+            )
+          }
+          placeholder="https://example.com"
+          className="h-14 w-full rounded-2xl border border-slate-300 px-4 outline-none transition focus:border-blue-500"
         />
       </div>
-
-      {/* Alias */}
-
-      <div>
-        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <Link2 size={16} />
-          Custom Alias
-        </label>
-
-        <input
-          type="text"
-          name="alias"
-          value={formData.alias}
-          onChange={handleChange}
-          placeholder="summer-sale"
-          className="h-14 w-full rounded-2xl border border-slate-300 px-4 outline-none transition-all focus:border-blue-500"
-        />
-      </div>
-
-      {/* Password */}
-
-      <div>
-        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <Lock size={16} />
-          Password
-        </label>
-
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Optional"
-          className="h-14 w-full rounded-2xl border border-slate-300 px-4 outline-none transition-all focus:border-blue-500"
-        />
-      </div>
-
-      {/* Expiration */}
-
-      <div>
-        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <Calendar size={16} />
-          Expiration
-        </label>
-
-        <input
-          type="date"
-          name="expiresAt"
-          value={formData.expiresAt}
-          onChange={handleChange}
-          className="h-14 w-full rounded-2xl border border-slate-300 px-4 outline-none transition-all focus:border-blue-500"
-        />
-      </div>
-
-      {/* Button */}
 
       <button
         type="submit"
         disabled={loading}
-        className="mt-4 h-14 w-full rounded-2xl bg-blue-600 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-400"
+        className="h-14 w-full rounded-2xl bg-blue-600 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading
           ? activeTab === "link"
@@ -121,8 +56,15 @@ function CreateForm({
             : "Generating..."
           : activeTab === "link"
           ? "Create Link"
-          : "Generate QR"}
+          : "Generate QR Code"}
       </button>
+
+      <p className="text-center text-sm text-slate-500">
+        Want custom aliases, password protection and expiration?
+        <span className="ml-1 font-medium text-blue-600">
+          Sign in to unlock advanced features.
+        </span>
+      </p>
     </form>
   );
 }

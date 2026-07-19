@@ -31,7 +31,7 @@ function LoginForm({ switchMode }) {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-sm">
 
       <div className="mb-10">
 

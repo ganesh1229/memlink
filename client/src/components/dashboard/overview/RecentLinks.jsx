@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Copy, ExternalLink } from "lucide-react";
-
+import toast from "react-hot-toast";
 import { getRecentLinks } from "../../../services/dashboard.service";
 
 function RecentLinks() {
@@ -24,7 +24,7 @@ function RecentLinks() {
 
   const handleCopy = async (url) => {
     await navigator.clipboard.writeText(url);
-    alert("Copied!");
+    toast.success("Link copied!");
   };
 
   if (loading) {

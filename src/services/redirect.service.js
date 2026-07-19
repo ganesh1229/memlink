@@ -100,7 +100,34 @@ const recordClick = async (
   ]);
 };
 
+const resolveLink = async (alias) => {
+  const link = await prisma.link.findUnique({
+    where: {
+      alias,
+    },
+  });
+
+  if (!link) {
+    throw new ApiError(404, "Link not found");
+  }
+
+  if (
+    link.expiresAt &&
+    new Date() > new Date(link.expiresAt)
+  ) {
+    return {
+      expired: true,
+    };
+  }
+
+  return {
+    expired: false,
+    passwordProtected: !!link.password,
+    originalUrl: link.originalUrl,
+  };
+};
+
 module.exports = {
   getLinkByAlias,
-  recordClick,
+  recordClick,resolveLink
 };

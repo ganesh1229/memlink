@@ -4,6 +4,8 @@ import {
   QrCode,
 } from "lucide-react";
 
+import toast from "react-hot-toast";
+
 function LinkActions({
   link,
   onShowQR,
@@ -13,9 +15,9 @@ function LinkActions({
       await navigator.clipboard.writeText(
         link.shortUrl
       );
-      alert("Short link copied!");
+      toast.success("Link copied!");
     } catch {
-      alert("Failed to copy link");
+      toast.success("Failed to copy Link");
     }
   };
 

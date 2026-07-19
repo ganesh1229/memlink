@@ -278,6 +278,185 @@ const getLinkQRCode = async (linkId, userId) => {
   return link;
 };
 
+const getDashboardStats = async (userId) => {
+  const totalLinks = await prisma.link.count({
+    where: {
+      userId,
+    },
+  });
+
+  const totalClicks = await prisma.link.aggregate({
+    where: {
+      userId,
+    },
+    _sum: {
+      clicks: true,
+    },
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayClicks = await prisma.clickEvent.count({
+    where: {
+      link: {
+        userId,
+      },
+      createdAt: {
+        gte: today,
+      },
+    },
+  });
+
+  const topLink = await prisma.link.findFirst({
+    where: {
+      userId,
+    },
+    orderBy: {
+      clicks: "desc",
+    },
+    select: {
+      alias: true,
+      clicks: true,
+    },
+  });
+
+  return {
+    totalLinks,
+    totalClicks: totalClicks._sum.clicks ?? 0,
+    todayClicks,
+    topLink,
+  };
+};
+
+const getAnalyticsService = async (userId) => {
+  const totalLinks = await prisma.link.count({
+    where: { userId },
+  });
+
+  const totalClicks = await prisma.link.aggregate({
+    where: { userId },
+    _sum: {
+      clicks: true,
+    },
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayClicks = await prisma.clickEvent.count({
+    where: {
+      link: {
+        userId,
+      },
+      createdAt: {
+        gte: today,
+      },
+    },
+  });
+
+  const uniqueVisitors = await prisma.clickEvent.groupBy({
+    by: ["ipAddress"],
+    where: {
+      link: {
+        userId,
+      },
+    },
+  });
+
+  const topLinks = await prisma.link.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      clicks: "desc",
+    },
+    take: 5,
+    select: {
+      alias: true,
+      clicks: true,
+    },
+  });
+
+  const browsers = await prisma.clickEvent.groupBy({
+    by: ["browser"],
+    where: {
+      link: {
+        userId,
+      },
+    },
+    _count: {
+      browser: true,
+    },
+    orderBy: {
+      _count: {
+        browser: "desc",
+      },
+    },
+  });
+
+  const devices = await prisma.clickEvent.groupBy({
+    by: ["device"],
+    where: {
+      link: {
+        userId,
+      },
+    },
+    _count: {
+      device: true,
+    },
+    orderBy: {
+      _count: {
+        device: "desc",
+      },
+    },
+  });
+
+  const referrers = await prisma.clickEvent.groupBy({
+    by: ["referrer"],
+    where: {
+      link: {
+        userId,
+      },
+    },
+    _count: {
+      referrer: true,
+    },
+    orderBy: {
+      _count: {
+        referrer: "desc",
+      },
+    },
+  });
+
+  return {
+    overview: {
+      totalLinks,
+      totalClicks: totalClicks._sum.clicks ?? 0,
+      todayClicks,
+      uniqueVisitors: uniqueVisitors.length,
+    },
+
+    topLinks,
+
+    browsers: browsers.map((item) => ({
+      browser: item.browser ?? "Unknown",
+      count: item._count.browser,
+    })),
+
+    devices: devices.map((item) => ({
+      device: item.device ?? "Unknown",
+      count: item._count.device,
+    })),
+
+    referrers: referrers.map((item) => ({
+      referrer: item.referrer ?? "Direct",
+      count: item._count.referrer,
+    })),
+  };
+};
+
 module.exports = {
-  createLink,getUserLinks,getLinkById,updateLink,deleteLink,getLinkAnalytics,unlockLink,getLinkQRCode
+  createLink,getUserLinks,getLinkById,updateLink,deleteLink,
+  getLinkAnalytics,unlockLink,getLinkQRCode,getDashboardStats,getAnalyticsService
 };

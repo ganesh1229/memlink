@@ -30,12 +30,29 @@ const registerUser = async (email, password) => {
   });
 
   const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt: new Date(
+        Date.now() +
+          REFRESH_TOKEN_DAYS *
+            24 *
+            60 *
+            60 *
+            1000
+      ),
+    },
+  });
 
   const { password: _, ...safeUser } = user;
 
   return {
     user: safeUser,
     accessToken,
+    refreshToken,
   };
 };
 
@@ -60,7 +77,6 @@ const loginUser = async (email, password) => {
   }
 
   const accessToken = generateAccessToken(user.id);
-
   const refreshToken = generateRefreshToken(user.id);
 
   await prisma.refreshToken.create({
@@ -116,23 +132,34 @@ const refreshAccessToken = async (refreshToken) => {
     throw new ApiError(401, "Refresh token expired");
   }
 
-  const accessToken = generateAccessToken(
-    decoded.userId
-  );
+  const accessToken = generateAccessToken(decoded.userId);
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: decoded.userId,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const { password, ...safeUser } = user;
 
   return {
+    user: safeUser,
     accessToken,
   };
 };
 
-const logoutUser = async (
-  refreshToken,
-  userId
-) => {
+const logoutUser = async (refreshToken) => {
+  if (!refreshToken) {
+    throw new ApiError(401, "Refresh token missing");
+  }
+
   const deleted = await prisma.refreshToken.deleteMany({
     where: {
       token: refreshToken,
-      userId,
     },
   });
 

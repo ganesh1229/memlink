@@ -25,7 +25,7 @@ function AuthSidePanel() {
   ];
 
   return (
-    <div className="hidden lg:flex flex-col justify-center rounded-[32px] bg-gradient-to-br from-blue-600 to-blue-700 p-12 text-white">
+    <div className="hidden lg:flex flex-col justify-center rounded-[32px] bg-gradient-to-br from-blue-600 to-blue-700 p-10 text-white">
 
       <div>
 
@@ -40,7 +40,7 @@ function AuthSidePanel() {
 
       </div>
 
-      <div className="mt-14 grid gap-6">
+      <div className="mt-12 grid gap-4">
 
         {features.map((feature) => {
           const Icon = feature.icon;

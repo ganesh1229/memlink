@@ -11,7 +11,7 @@ function LatestLinks({ links = [] }) {
     return (
       <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
         <h3 className="text-xl font-semibold text-slate-700">
-          No links yet
+          Create your own link
         </h3>
 
         <p className="mt-2 text-slate-500">

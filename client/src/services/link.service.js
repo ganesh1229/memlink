@@ -24,3 +24,27 @@ export const generateQRCode = async (id) => {
   return response.data;
 };
 
+export const resolveLink = async (alias) => {
+  const response = await api.get(
+    `/resolve/${alias}`
+  );
+
+  return response.data;
+};
+
+export const unlockLink = async (
+  alias,
+  password
+) => {
+  const response = await api.post(
+    `/links/${alias}/unlock`,
+    {
+      password,
+    },
+    {
+      withCredentials: true,
+    }
+  );
+
+  return response.data;
+};

@@ -5,12 +5,14 @@ import {
   CheckCircle,
 } from "lucide-react";
 
+import toast from "react-hot-toast";
+
 function ResultCard({ result }) {
   if (!result) return null;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(result.shortUrl);
-    alert("Copied!");
+    toast.success("Link copied!");
   };
 
   return (

@@ -1,25 +1,42 @@
 import { useState } from "react";
+
 import CreateTabs from "./CreateTabs";
 import CreateForm from "./CreateForm";
 import CreateResult from "./CreateResult";
+import toast from "react-hot-toast";
+import { createLink } from "../../../services/link.service";
 
 function CreateCard() {
   const [activeTab, setActiveTab] = useState("link");
+
   const [loading, setLoading] = useState(false);
+
   const [result, setResult] = useState(null);
 
-    const handleSubmit = async (formData) => {
+  const handleSubmit = async (formData) => {
     setLoading(true);
 
-    console.log(activeTab);
-    console.log(formData);
+    try {
+      const payload = {
+        originalUrl: formData.originalUrl,
+      };
 
-    setLoading(false);
-    };
+      const response = await createLink(payload);
+
+      setResult(response.data);
+    } catch (err) {
+      console.error(err);
+
+      toast(
+          "Failed to create link"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleReset = () => {
     setResult(null);
-    setLoading(false);
   };
 
   return (
@@ -46,10 +63,12 @@ function CreateCard() {
       {/* Tabs */}
 
       <div className="px-8 pt-6">
+
         <CreateTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
+
       </div>
 
       {/* Form */}
@@ -67,6 +86,7 @@ function CreateCard() {
       {/* Result */}
 
       {result && (
+
         <div className="border-t border-slate-200 bg-slate-50 px-8 py-6">
 
           <CreateResult
@@ -76,6 +96,7 @@ function CreateCard() {
           />
 
         </div>
+
       )}
 
     </div>
