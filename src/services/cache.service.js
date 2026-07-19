@@ -42,11 +42,19 @@ const cacheUnlockToken = async (alias, token) => {
 };
 
 const isUnlocked = async (alias, token) => {
+  console.log("Checking Redis...");
+  console.log("Alias:", alias);
+  console.log("Token:", token);
+
   if (!token) return false;
 
-  const value = await redisClient.get(
-    `unlock:${alias}:${token}`
-  );
+  const key = `unlock:${alias}:${token}`;
+
+  console.log("Redis Key:", key);
+
+  const value = await redisClient.get(key);
+
+  console.log("Redis Value:", value);
 
   return value === "true";
 };

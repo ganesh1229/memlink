@@ -11,6 +11,7 @@ const {
 const getLinkByAlias = async (alias,unlockToken) => {
   let link = await getCachedLink(alias);
 
+  
 
   if (link) {
   } else {
@@ -38,12 +39,18 @@ const getLinkByAlias = async (alias,unlockToken) => {
   const hasPassword =
   link.hasPassword ?? !!link.password;
 
+  console.log("Alias:", alias);
+  console.log("Cookie unlockToken:", unlockToken);
+  console.log("Has Password:", hasPassword);
+
+
 if (hasPassword) {
+  
   const unlocked = await isUnlocked(
     alias,
     unlockToken
   );
-
+  console.log("Unlocked:", unlocked);
   if (!unlocked) {
     throw new ApiError(
       401,
