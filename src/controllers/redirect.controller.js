@@ -12,7 +12,7 @@ const redirect = asyncHandler(async (req, res) => {
   
   const link = await getLinkByAlias(
     req.params.alias,
-    req.cookies.unlockToken
+    req.query.token
   );
 
   await recordClick(

@@ -201,8 +201,8 @@ const unlock = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json({
-    success: true,
-    message: "Link unlocked successfully",
+  success: true,
+  unlockToken,
   });
 });
 
