@@ -26,8 +26,8 @@ function PasswordProtected() {
 
       const response = await unlockLink(alias, password);
 
-      window.location.href =
-        `https://memlink-backend.onrender.com/${alias}?token=${response.data.unlockToken}`;
+window.location.href =
+  `https://memlink-backend.onrender.com/${alias}?token=${response.unlockToken}`;
 
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");

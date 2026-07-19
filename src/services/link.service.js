@@ -213,6 +213,11 @@ const getLinkAnalytics = async (linkId, userId) => {
 
 
 const unlockLink = async (alias, password) => {
+  console.log("========== UNLOCK LINK ==========");
+  console.log("Alias:", alias);
+  console.log("Password:", JSON.stringify(password));
+  console.log("Password Type:", typeof password);
+
   const link = await prisma.link.findUnique({
     where: {
       alias,
@@ -222,6 +227,8 @@ const unlockLink = async (alias, password) => {
   if (!link) {
     throw new ApiError(404, "Link not found");
   }
+
+  console.log("Stored Hash:", link.password);
 
   if (
     link.expiresAt &&
@@ -242,16 +249,20 @@ const unlockLink = async (alias, password) => {
     link.password
   );
 
+  console.log("bcrypt.compare Result:", valid);
+
   if (!valid) {
     throw new ApiError(401, "Invalid password");
   }
 
   const unlockToken = crypto.randomUUID();
 
-  await cacheUnlockToken(
-    alias,
-    unlockToken
-  );
+  console.log("Generated Unlock Token:", unlockToken);
+
+  await cacheUnlockToken(alias, unlockToken);
+
+  console.log("Unlock token cached successfully");
+  console.log("================================");
 
   return unlockToken;
 };

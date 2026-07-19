@@ -203,7 +203,7 @@ const unlock = asyncHandler(async (req, res) => {
   res.status(200).json({
   success: true,
   unlockToken,
-  });
+});
 });
 
 const qrCode = asyncHandler(async (req, res) => {
