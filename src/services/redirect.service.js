@@ -32,7 +32,7 @@ const getLinkByAlias = async (alias,unlockToken) => {
   if (
     link.expiresAt &&
     new Date() > new Date(link.expiresAt)
-  ) {
+  ){
     throw new ApiError(410, "This link has expired.");
   }
 
@@ -42,7 +42,6 @@ const getLinkByAlias = async (alias,unlockToken) => {
   console.log("Alias:", alias);
   console.log("Cookie unlockToken:", unlockToken);
   console.log("Has Password:", hasPassword);
-
 
 if (hasPassword) {
   
