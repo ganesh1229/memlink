@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import toast from "react-hot-toast";
 import { resolveLink } from "../../services/link.service";
 
 function RedirectHandler() {

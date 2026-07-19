@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import toast from "react-hot-toast";
 import SearchBar from "../../components/dashboard/links/SearchBar";
 import LinksTable from "../../components/dashboard/links/LinksTable";
 import Pagination from "../../components/dashboard/links/Pagination";

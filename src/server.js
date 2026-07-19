@@ -14,7 +14,7 @@ const startServer = async () => {
 
     server = app.listen(PORT);
   } catch (error) {
-    toast.error(err.response?.data?.message || "Something went wrong");
+    console.error("Failed to start server:", error);
     process.exit(1);
   }
 };

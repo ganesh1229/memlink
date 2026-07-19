@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import toast from "react-hot-toast";
 import AnalyticsCard from "../../components/dashboard/analytics/AnalyticsCard";
 import BrowserChart from "../../components/dashboard/analytics/BrowserChart";
 import DeviceChart from "../../components/dashboard/analytics/DeviceChart";

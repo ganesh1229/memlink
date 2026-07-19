@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { useParams } from "react-router-dom";
-
+import toast from "react-hot-toast";
 import { unlockLink } from "../../services/link.service";
 
 function PasswordProtected() {

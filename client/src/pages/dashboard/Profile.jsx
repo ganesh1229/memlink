@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Mail, Calendar } from "lucide-react";
-
+import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { getProfile } from "../../services/profile.service";
 

@@ -6,7 +6,7 @@ import {
   Check,
 } from "lucide-react";
 import { useState } from "react";
-
+import toast from "react-hot-toast";
 function CreateResult({ result, onReset }) {
   const [copied, setCopied] = useState(false);
 
