@@ -6,10 +6,11 @@ const validate = (schema) => {
     } catch (error) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
-        errors: error.errors?.map((err) => ({
-          field: err.path.join("."),
-          message: err.message,
+        message:
+          error.issues?.[0]?.message,
+        errors: error.issues?.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
         })),
       });
     }
